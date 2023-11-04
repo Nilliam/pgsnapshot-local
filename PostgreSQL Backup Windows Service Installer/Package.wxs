@@ -1,0 +1,48 @@
+﻿<?define Name = "PostgreSQL Backup Service" ?>
+<?define Manufacturer = "PostgreSQL Backup" ?>
+
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+	<Package Name="$(Name)"
+			 Manufacturer="$(Manufacturer)"
+			 Version="1.0.0.0"
+			 UpgradeCode="8ab78dbe-e7af-4dff-be1b-855715f8b319"
+			 Compressed="true">
+
+		<Property Id="MsiLogging" Value="voicewarmup" />
+
+		<!-- Allow upgrades and prevent downgrades -->
+		<MajorUpgrade DowngradeErrorMessage="A later version of [ProductName] is already installed. Setup will now exit." />
+
+		<Feature Id="Service" Title="PostgreSQLBackupService Setup" Level="1">
+			<ComponentRef Id="ServiceExecutable" />
+		</Feature>
+
+		<Directory Id="TARGETDIR" Name="SourceDir">
+			<Directory Id="ProgramFilesFolder">
+				<Directory Id="INSTALLFOLDER" Name="$(var.Name)">
+					<Component Id="ServiceExecutable" >
+						<File Id="PostgreSQLBackupService" 
+							  Source="..\Local PostgreSQL Backup Service\postgres-backup.exe"
+							  KeyPath="true" />
+						<RemoveFile Id="ALLFILES" Name="*.*" On="both" />
+						<ServiceInstall Id="ServiceInstaller"
+                                        Type="ownProcess"
+                                        Name="PostgreSQLBackupService"
+                                        DisplayName="$(var.Name)"
+                                        Description="A Backup service that periodically dump a database and send a copy to the preferred destination."
+                                        Start="demand"
+                                        ErrorControl="normal" 
+										Interactive="no"/>
+						<ServiceControl Id="StartService"
+                                       Start="install"
+                                       Stop="both"
+                                       Remove="uninstall"
+                                       Name="PostgreSQLBackupService"
+                                       Wait="no" />
+
+					</Component>
+				</Directory>
+			</Directory>
+		</Directory>
+	</Package>
+</Wix>
