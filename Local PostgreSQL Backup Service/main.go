@@ -31,7 +31,7 @@ func (p *program) run() {
 		file, err := os.Open("settings.json")
 		if err != nil {
 			log.Println("Error opening settings file:", err)
-			return
+			panic(err)
 		}
 		defer file.Close()
 
@@ -39,7 +39,7 @@ func (p *program) run() {
 		err = json.NewDecoder(file).Decode(&settings)
 		if err != nil {
 			log.Println("Error decoding settings file:", err)
-			return
+			panic(err)
 		}
 
 		dump(settings)
@@ -102,8 +102,10 @@ func dump(settings Settings) {
 
 		dumpExec := dump.Exec(pg.ExecOptions{StreamPrint: true, StreamDestination: os.Stdout})
 		if dumpExec.Error != nil {
+			fmt.Println("Dump failed")
 			fmt.Println(dumpExec.Error.Err)
 			fmt.Println(dumpExec.Output)
+			panic(dumpExec.Error.Err)
 		} else {
 			fmt.Println("Dump success")
 			fmt.Println(dumpExec.Output)
