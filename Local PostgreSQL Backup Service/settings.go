@@ -1,6 +1,9 @@
 package main
 
 type Settings struct {
+	ServerName string `json:"serverName"`
+	ServerUrl  string `json:"serverUrl"`
+	Webhook    string `json:"webhook"`
 	Connection struct {
 		Host string `json:"host"`
 		Port int    `json:"port"`

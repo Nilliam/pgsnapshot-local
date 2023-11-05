@@ -1,4 +1,8 @@
 {
+  "serverName": "",
+  "serverUrl": "",
+  "fileServer" : "",
+  "webhook" : "",
   "connection": {
     "host": "localhost",
     "port": 5432,

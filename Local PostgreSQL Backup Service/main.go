@@ -103,6 +103,7 @@ func dump(settings Settings) {
 		dumpExec := dump.Exec(pg.ExecOptions{StreamPrint: true, StreamDestination: os.Stdout})
 		if dumpExec.Error != nil {
 			fmt.Println("Dump failed")
+			SendWebhook(settings.Webhook, "Dump failed")
 			fmt.Println(dumpExec.Error.Err)
 			fmt.Println(dumpExec.Output)
 			panic(dumpExec.Error.Err)
@@ -112,7 +113,16 @@ func dump(settings Settings) {
 			zipDump := database + ".zip"
 			AddFileToZip(zipDump, database+".sql")
 		}
+	}
+	serverStatus(settings)
+}
 
+func serverStatus(settings Settings) {
+	if settings.ServerUrl == "" {
+		message := "The Backup Service is currently " +
+			"running in local mode because no server configuration was found. " +
+			"To enable synchronization, please add the server name and URL to the properties in settings.json."
+		SendWebhook(settings.Webhook, message)
 	}
 }
 
