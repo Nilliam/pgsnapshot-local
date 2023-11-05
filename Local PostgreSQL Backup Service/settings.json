@@ -1,0 +1,10 @@
+{
+  "connection": {
+    "host": "localhost",
+    "port": 5432,
+    "user": "postgres"
+  },
+  "backupTimes": ["07:00:00", "12:00:00", "19:00:00"],
+  "databases": ["postgres"],
+  "folders": []
+}
