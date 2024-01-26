@@ -112,8 +112,10 @@ func dump(settings Settings) {
 			fmt.Println(dumpExec.Output)
 			zipDump := database + ".zip"
 			AddFileToZip(zipDump, database+".sql")
+			UploadToS3(settings, database+".zip")
 		}
 	}
+
 	serverStatus(settings)
 }
 
@@ -127,10 +129,12 @@ func serverStatus(settings Settings) {
 }
 
 func main() {
+
+	serviceName := "PostgreSQL Backup Service"
 	svcConfig := &service.Config{
-		Name:        "PostgreSQL Backup Service",
-		DisplayName: "PostgreSQL Backup Service",
-		Description: "PostgreSQL Backup Service",
+		Name:        serviceName,
+		DisplayName: serviceName,
+		Description: serviceName,
 	}
 
 	prg := &program{}
