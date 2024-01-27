@@ -21,11 +21,14 @@ func BackupFolders(settings Settings) {
 	defer zipFile.Close()
 
 	zipWriter := zip.NewWriter(zipFile)
-	defer zipWriter.Close()
 
 	for _, folder := range settings.Folders {
 		AddFolderToZip(zipWriter, folder)
 	}
+
+	zipWriter.Close()
+
+	UploadToS3(settings, destinationZip)
 
 	fmt.Println("Folder backup complete!")
 }
