@@ -11,7 +11,7 @@ import (
 )
 
 func UploadToS3(settings Settings, filePath string) {
-	if settings.ServerName == "" || settings.S3Bucket == "" {
+	if settings.S3Bucket == "" || settings.S3Directory == "" {
 		fmt.Println("S3 settings not set, skipping upload.")
 		return
 	}
@@ -39,7 +39,7 @@ func UploadToS3(settings Settings, filePath string) {
 	defer file.Close()
 
 	bucketName := settings.S3Bucket
-	keyName := fmt.Sprintf("%s/%s", settings.ServerName, file.Name())
+	keyName := fmt.Sprintf("%s/%s", settings.S3Directory, file.Name())
 
 	_, err = svc.PutObject(&s3.PutObjectInput{
 		Bucket: aws.String(bucketName),

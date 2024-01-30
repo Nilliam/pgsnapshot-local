@@ -4,6 +4,7 @@
   "fileServer" : "",
   "webhook" : "",
   "s3Bucket" : "",
+  "s3Directory" : "",
   "awsRegion" : "",
   "connection": {
     "host": "localhost",
