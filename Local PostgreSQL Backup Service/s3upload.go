@@ -11,6 +11,11 @@ import (
 )
 
 func UploadToS3(settings Settings, filePath string) {
+	if settings.ServerName == "" || settings.S3Bucket == "" {
+		fmt.Println("S3 settings not set, skipping upload.")
+		return
+	}
+
 	awsAccessKeyID := os.Getenv("AWS_ACCESS_KEY_ID")
 	awsSecretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
 	awsRegion := settings.AwsRegion
