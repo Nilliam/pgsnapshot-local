@@ -70,6 +70,8 @@ func (p *program) run() {
 
 		// Sleep until the next backup time
 		log.Printf("Next backup scheduled for %s", nextBackupTime.Format("2006-01-02 15:04:05"))
+
+		notifyServerStatus(settings)
 		time.Sleep(duration)
 
 	}
@@ -103,10 +105,11 @@ func dump(settings Settings) {
 		dumpExec := dump.Exec(pg.ExecOptions{StreamPrint: true, StreamDestination: os.Stdout})
 		if dumpExec.Error != nil {
 			fmt.Println("Dump failed")
-			SendWebhook(settings.Webhook, "Dump failed")
+
+			messageWebhookDumpFailed(database, settings)
+
 			fmt.Println(dumpExec.Error.Err)
 			fmt.Println(dumpExec.Output)
-			panic(dumpExec.Error.Err)
 		} else {
 			fmt.Println("Dump success")
 			fmt.Println(dumpExec.Output)
@@ -116,14 +119,23 @@ func dump(settings Settings) {
 		}
 	}
 
-	serverStatus(settings)
 }
 
-func serverStatus(settings Settings) {
-	if settings.ServerUrl == "" {
+func messageWebhookDumpFailed(database string, settings Settings) {
+	if settings.Webhook == "" {
+		return
+	}
+
+	SendWebhook(settings.Webhook,
+		fmt.Sprintf("Failed to dump %s database in the %s server!", database, settings.ServerName))
+}
+
+func notifyServerStatus(settings Settings) {
+	notifyWebhook := settings.ServerUrl == "" && settings.S3Bucket == "" && settings.Webhook != ""
+	if notifyWebhook {
 		message := "The Backup Service is currently " +
 			"running in local mode because no server configuration was found. " +
-			"To enable synchronization, please add the server name and URL to the properties in settings.json."
+			"To enable synchronization, please add the server name and URL or S3 Bucket to the properties in settings.json. Server Name: " + settings.ServerName
 		SendWebhook(settings.Webhook, message)
 	}
 }
