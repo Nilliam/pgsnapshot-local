@@ -1,15 +1,18 @@
 {
   "serverName": "default",
   "serverUrl": "",
-  "fileServer" : "",
-  "webhook" : "",
-  "s3Bucket" : "",
-  "s3Directory" : "",
-  "awsRegion" : "",
+  "fileServer": "",
+  "webhook": "",
+  "s3Bucket": "",
+  "s3Directory": "",
+  "awsRegion": "",
+  "awsAccessKeyIdEncoded": "",
+  "awsSecretAccessKeyEncoded": "",
   "connection": {
     "host": "localhost",
     "port": 5432,
-    "user": "postgres"
+    "user": "postgres",
+    "passwordEncoded": ""
   },
   "backupTimes": ["07:00:00", "12:00:00", "19:00:00"],
   "databases": [],

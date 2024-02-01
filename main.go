@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -49,18 +50,25 @@ func (p *program) run() {
 		var closestTime time.Time
 		for _, backupTime := range settings.BackupTimes {
 			parsedTime, err := time.Parse("15:04:05", backupTime)
+			parsedTime = time.Date(now.Year(), now.Month(), now.Day(), parsedTime.Hour(), parsedTime.Minute(), parsedTime.Second(), 0, now.Location())
+
 			if err != nil {
 				log.Println("Error parsing backup time:", err)
 				return
 			}
-			if closestTime == (time.Time{}) || (parsedTime.After(now) && parsedTime.Before(closestTime)) {
+
+			if closestTime == (time.Time{}) {
 				closestTime = parsedTime
+			}
+
+			if parsedTime.After(now) {
+				closestTime = parsedTime
+				break
 			}
 		}
 
 		closestTime = time.Date(now.Year(), now.Month(), now.Day(), closestTime.Hour(), closestTime.Minute(), closestTime.Second(), 0, now.Location())
 
-		// Calculate the duration until the next backup time
 		now = time.Now()
 		nextBackupTime := closestTime
 		if nextBackupTime.Before(now) {
@@ -79,15 +87,18 @@ func (p *program) run() {
 
 func dump(settings Settings) {
 
+	passwordBytes, _ := base64.StdEncoding.DecodeString(settings.Connection.PasswordEncoded)
+
 	postgres := &pg.Postgres{
 		Host:     settings.Connection.Host,
 		Port:     settings.Connection.Port,
 		Username: settings.Connection.User,
-		Password: os.Getenv("PGPASSWORD"),
+		Password: string(passwordBytes),
 	}
 
 	dump, err := pg.NewDump(postgres)
 	if err != nil {
+
 		panic(err)
 	}
 

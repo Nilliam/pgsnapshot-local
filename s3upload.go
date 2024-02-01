@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"fmt"
 	"os"
 
@@ -16,13 +17,13 @@ func UploadToS3(settings Settings, filePath string) {
 		return
 	}
 
-	awsAccessKeyID := os.Getenv("AWS_ACCESS_KEY_ID")
-	awsSecretAccessKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
+	awsAccessKeyIDBytes, _ := base64.StdEncoding.DecodeString(settings.AwsAccessKeyIdEncoded)
+	awsSecretAccessKeyBytes, _ := base64.StdEncoding.DecodeString(settings.AwsSecretAccessKeyEncoded)
 	awsRegion := settings.AwsRegion
 
 	sess, err := session.NewSession(&aws.Config{
 		Region:      aws.String(awsRegion),
-		Credentials: credentials.NewStaticCredentials(awsAccessKeyID, awsSecretAccessKey, ""),
+		Credentials: credentials.NewStaticCredentials(string(awsAccessKeyIDBytes), string(awsSecretAccessKeyBytes), ""),
 	})
 	if err != nil {
 		fmt.Println("Failed to create session:", err)
