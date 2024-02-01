@@ -26,6 +26,7 @@ func UploadToS3(settings Settings, filePath string) {
 	})
 	if err != nil {
 		fmt.Println("Failed to create session:", err)
+		notifyS3UploadError(settings, err.Error())
 		return
 	}
 
@@ -34,6 +35,7 @@ func UploadToS3(settings Settings, filePath string) {
 	file, err := os.Open(filePath)
 	if err != nil {
 		fmt.Println("Failed to open file:", err)
+		notifyS3UploadError(settings, err.Error())
 		return
 	}
 	defer file.Close()
@@ -48,8 +50,17 @@ func UploadToS3(settings Settings, filePath string) {
 	})
 	if err != nil {
 		fmt.Println("Failed to upload file:", err)
+		notifyS3UploadError(settings, err.Error())
 		return
 	}
 
 	fmt.Println("File successfully uploaded to", bucketName)
+}
+
+func notifyS3UploadError(settings Settings, errorMessage string) {
+	notifyWebhook := settings.Webhook != ""
+	if notifyWebhook {
+		message := "Could not upload to S3 bucket. " + errorMessage + " Server Name: " + settings.ServerName
+		SendWebhook(settings.Webhook, message)
+	}
 }

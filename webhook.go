@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"html"
 	"net/http"
 )
 
@@ -12,12 +11,9 @@ func SendWebhook(url string, message string) error {
 		return nil
 	}
 
-	sanitizedMessage := html.EscapeString(message)
-	sanitizedMessage = fmt.Sprintf(`{"content": "%s"}`, sanitizedMessage)
+	content := fmt.Sprintf(`{"content": "%s"}`, message)
 
-	fmt.Printf(sanitizedMessage)
-
-	jsonStr := []byte(sanitizedMessage)
+	jsonStr := []byte(content)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	if err != nil {
 		return err
